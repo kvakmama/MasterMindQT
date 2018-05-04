@@ -13,29 +13,28 @@ class Window : public QWidget
     // storing the current game state
     game mGame;
     // holding the buttons matching the game state
-    typedef std::array<QPushButton*,4> Line;
-    std::array<Line,10> mButtons;
-    std::array<QLabel*,10> mResults;
-    QPushButton* mButtons2[1][8];
-    Line mButtons3;
+    typedef std::array<QPushButton*,4> lineFours;
+    std::array<lineFours,10> playerButtons;
+    std::array<QLabel*,10> playerResultsLabel;
+    QPushButton* paletteButtons[1][8];
+    lineFours buttonsFours;
 
     QPushButton* newGame;
 
-    QString mSelectedStyleSheet;
-    void UpdateUI();
-    void UpdateUI2();
+    QString selectedStyleSheet;
+    void UpdatePlayerButtons();
+    void UpdatePalette();
+    QString CheckColors(const lineFours &pcolor, const lineFours &rcolor);
 
-    QString CheckGame(const Line &pcolor, const Line &rcolor);
 public:
     explicit Window(QWidget *parent = nullptr);
 
 private slots:
-    void buttonClickedGet();
-    void buttonClickedSet();
-    void RColor(std::array<QString,8>& arrayHolder);
-    void UpdateUI3();
-
-    void CheckButtonClicked();
+    void ButtonClickedGet();
+    void ButtonClickedSet();
+    void ButtonClickedCheck();
+    void ShuffleColors(std::array<QString,8>& arrayHolder);
+    void UpdateRaceColors();
 };
 
 #endif // WINDOW_H

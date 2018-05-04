@@ -13,30 +13,13 @@
 #include <chrono>       // std::chrono::system_clock
 using namespace std;
 
-void Window::buttonClickedGet()
-{
-    QPushButton* pb(qobject_cast<QPushButton*>(sender()));
-    if (pb)
-    {
-        mSelectedStyleSheet = pb->styleSheet();
-    }
-}
-
-void Window::buttonClickedSet()
-{
-    QPushButton* pb(qobject_cast<QPushButton*>(sender()));
-    if (pb)
-    {
-        pb->setStyleSheet(mSelectedStyleSheet);
-    }
-}
-
 Window::Window(QWidget *parent) : QWidget(parent)
 {
     QHBoxLayout* hblayout(new QHBoxLayout);
     QVBoxLayout* vblayout(new QVBoxLayout);
+    QGridLayout* layoutGameMenu(new QGridLayout);
 
-    QGridLayout* layout(new QGridLayout);
+    QGridLayout* layoutPlayerButtons(new QGridLayout);
     for (int i = 0; i != 10; ++i)
     {
        for (int j = 0; j != 4; ++j)
@@ -44,91 +27,91 @@ Window::Window(QWidget *parent) : QWidget(parent)
             QPushButton* pb = new QPushButton;
             pb->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
             pb->setFixedSize(33,33);
-            layout->addWidget(pb,i,j);
-            connect(pb, SIGNAL(clicked(bool)), this, SLOT(buttonClickedSet()));
+            layoutPlayerButtons->addWidget(pb,i,j);
+            connect(pb, SIGNAL(clicked(bool)), this, SLOT(ButtonClickedSet()));
             QFont font = pb->font();
             font.setPointSize(33);
             pb->setFont(font);
-            mButtons[i][j]=pb;
+            playerButtons[i][j]=pb;
        }
        QLabel* labelCheck(new QLabel("lofasz"));
-       layout->addWidget(labelCheck,i,4);
-       mResults[i] = labelCheck;
+       layoutPlayerButtons->addWidget(labelCheck,i,4);
+       playerResultsLabel[i] = labelCheck;
     }
-    UpdateUI();
+    UpdatePlayerButtons();
 
-    QGridLayout* layout2(new QGridLayout);
+    QGridLayout* layoutPalette(new QGridLayout);
     for (int i = 0; i != 1; ++i)
     {
        for (int j = 0; j != 8; ++j)
        {
             QPushButton* pb = new QPushButton;
             pb->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-            layout2->addWidget(pb,i,j);
-            connect(pb, SIGNAL(clicked(bool)), this, SLOT(buttonClickedGet()));
+            layoutPalette->addWidget(pb,i,j);
+            connect(pb, SIGNAL(clicked(bool)), this, SLOT(ButtonClickedGet()));
             QFont font = pb->font();
             font.setPointSize(33);
             pb->setFont(font);
-            mButtons2[i][j]=pb;
+            paletteButtons[i][j]=pb;
        }
     }
-    UpdateUI2();
+    UpdatePalette();
 
-    QGridLayout* layout3(new QGridLayout);
+    QGridLayout* layoutRaceColors(new QGridLayout);
     for (int j = 0; j != 4; ++j)
     {
         QPushButton* pb = new QPushButton;
         pb->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-        layout3->addWidget(pb,1,j);
-        connect(pb, SIGNAL(clicked(bool)), this, SLOT(buttonClickedGet()));
+        layoutRaceColors->addWidget(pb,1,j);
+        connect(pb, SIGNAL(clicked(bool)), this, SLOT(ButtonClickedGet()));
         QFont font = pb->font();
         font.setPointSize(33);
         pb->setFont(font);
-        mButtons3[j]=pb;
+        buttonsFours[j]=pb;
     }
-    UpdateUI3();
+    UpdateRaceColors();
 
-    QPushButton* newGame = new QPushButton("&New",this);
+    QPushButton* newGame = new QPushButton("&Shuffle",this);
     newGame->setVisible(true);
-    newGame->setStyleSheet("color:black; background-color:red");
-    connect(newGame, SIGNAL(clicked(bool)), this, SLOT(UpdateUI3()));
+    newGame->setStyleSheet("color:purple; background-color:white");
+    connect(newGame, SIGNAL(clicked(bool)), this, SLOT(UpdateRaceColors()));
     QFont font = newGame->font();
     font.setPointSize(33);
     newGame->setFont(font);
 
     QPushButton* checkGame = new QPushButton("&Check",this);
     checkGame->setVisible(true);
-    checkGame->setStyleSheet("color:black; background-color:red");
-    connect(checkGame, SIGNAL(clicked(bool)), this, SLOT(CheckButtonClicked()));
+    checkGame->setStyleSheet("color:red; background-color:white");
+    connect(checkGame, SIGNAL(clicked(bool)), this, SLOT(ButtonClickedCheck()));
     checkGame->setFont(font);
 
-    QLabel* label(new QLabel("lofasz"));
-    label->setVisible(true);
-    label->setStyleSheet("QLabel {background-color : grey;}");
-    label->setAutoFillBackground(true);
+    QLabel* gameLabel(new QLabel("lofasz"));
+    gameLabel->setVisible(true);
+    gameLabel->setStyleSheet("QLabel {background-color : grey;}");
+    gameLabel->setAutoFillBackground(true);
 
-    layout2->addWidget(newGame,4,1);
-    layout2->addWidget(label,1,0);
-    layout2->setRowStretch(1,1);
+    layoutPalette->setRowStretch(1,1);
+    layoutRaceColors->setRowStretch(1,1);
+    layoutPlayerButtons->setRowStretch(1,1);
 
-    layout3->setRowStretch(1,1);
-
-
-    hblayout->addLayout(layout);
-    vblayout->addLayout(layout3);
-    vblayout->addLayout(layout2);
+    hblayout->addLayout(layoutPlayerButtons);
+    vblayout->addLayout(layoutRaceColors);
+    vblayout->addLayout(layoutPalette);
+    vblayout->addWidget(gameLabel);
+    layoutGameMenu->addWidget(newGame,0,0);
+    layoutGameMenu->addWidget(checkGame,0,1);
+    vblayout->addLayout(layoutGameMenu);
     hblayout->addLayout(vblayout);
-
     setLayout(hblayout);
 }
 
-void Window::UpdateUI()
+void Window::UpdatePlayerButtons()
 {
     for (int i = 0; i != 10; ++i)
     {
        for (int j = 0; j != 4; ++j)
        {
-            QPushButton* pb = mButtons[i][j];
+            QPushButton* pb = playerButtons[i][j];
             int state = mGame.get_elem(game::input{i,j});
             QString color;
             if (state == 0)
@@ -142,31 +125,31 @@ void Window::UpdateUI()
     }
 }
 
-void Window::UpdateUI2()
+void Window::UpdatePalette()
 {
-    QString paletta_color []={"white","yellow","orange","red","pink","green","blue","black"};
+    QString paletteColor []={"white","yellow","orange","red","pink","green","blue","black"};
     for (int i = 0; i != 8; ++i)
     {
-         QPushButton* pb = mButtons2[0][i];
+         QPushButton* pb = paletteButtons[0][i];
          int state = mGame.get_elem(game::input{0,i});
          QString color;
          if (state == 0)
          {
              pb->setEnabled(true);
              pb->setText("");
-             color = paletta_color[i];
+             color = paletteColor[i];
          }
          pb->setStyleSheet("color:black; background-color:"+color);
     }
 }
 
-void Window::UpdateUI3()
+void Window::UpdateRaceColors()
 {
-    array<QString,8> paletta_color={"white","yellow","orange","red","pink","green","blue","black"};
-    RColor(paletta_color);
+    array<QString,8> paletteColor={"white","yellow","orange","red","pink","green","blue","black"};
+    ShuffleColors(paletteColor);
     for (int i = 0; i != 4; ++i)
     {
-         QPushButton* pb = mButtons3[i];
+         QPushButton* pb = buttonsFours[i];
          if (pb==NULL)
          {
              continue;
@@ -179,24 +162,24 @@ void Window::UpdateUI3()
              pb->setDisabled(true);
              //pb->setVisible(false);
              pb->setText("");
-             color = paletta_color[i];
+             color = paletteColor[i];
          }
          pb->setStyleSheet("color:black; background-color:"+color);
     }
 }
 
-void Window::RColor(array<QString,8>& arrayHolder)
+void Window::ShuffleColors(array<QString,8>& arrayHolder)
 {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     shuffle(arrayHolder.begin(), arrayHolder.end(), std::default_random_engine(seed));
 }
 
-void Window::CheckButtonClicked()
+void Window::ButtonClickedCheck()
 {
-    mResults[0]->setText(CheckGame(mButtons3, mButtons[0]));
+    playerResultsLabel[0]->setText(CheckColors(buttonsFours, playerButtons[0]));
 }
 
-QString Window::CheckGame(Line const& pcolor, Line const& rcolor)
+QString Window::CheckColors(lineFours const& pcolor, lineFours const& rcolor)
 {
     QString rv;
     QStringList rcolorsStyles;
@@ -223,3 +206,20 @@ QString Window::CheckGame(Line const& pcolor, Line const& rcolor)
     return rv;
 }
 
+void Window::ButtonClickedGet()
+{
+    QPushButton* pb(qobject_cast<QPushButton*>(sender()));
+    if (pb)
+    {
+        selectedStyleSheet = pb->styleSheet();
+    }
+}
+
+void Window::ButtonClickedSet()
+{
+    QPushButton* pb(qobject_cast<QPushButton*>(sender()));
+    if (pb)
+    {
+        pb->setStyleSheet(selectedStyleSheet);
+    }
+}
