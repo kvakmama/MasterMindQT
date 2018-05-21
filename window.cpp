@@ -153,7 +153,6 @@ void Window::UpdateRaceColors()
          if (pb==NULL)
          {
              continue;
-
          }
          int state = mGame.get_elem(game::input{0,i});
          QString color;
@@ -179,7 +178,7 @@ void Window::ButtonClickedCheck()
     playerResultsLabel[0]->setText(CheckColors(buttonsFours, playerButtons[0]));
 }
 
-QString Window::CheckColors(lineFours const& pcolor, lineFours const& rcolor)
+QString Window::CheckColors(lineFours const& rcolor, lineFours const& pcolor)
 {
     QString rv;
     QStringList rcolorsStyles;
@@ -202,6 +201,16 @@ QString Window::CheckColors(lineFours const& pcolor, lineFours const& rcolor)
     }
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     shuffle(rv.begin(), rv.end(), std::default_random_engine(seed));
+
+    if ((pcolor[0]->styleSheet() == pcolor[1]->styleSheet()) ||
+        (pcolor[0]->styleSheet() == pcolor[2]->styleSheet()) ||
+            (pcolor[0]->styleSheet() == pcolor[3]->styleSheet()) ||
+            (pcolor[1]->styleSheet() == pcolor[2]->styleSheet()) ||
+            (pcolor[1]->styleSheet() == pcolor[3]->styleSheet()) ||
+            (pcolor[2]->styleSheet() == pcolor[3]->styleSheet()))
+    {
+        rv = "color_duplicated";
+    }
 
     return rv;
 }
