@@ -11,6 +11,7 @@
 #include <array>        // std::array
 #include <random>       // std::default_random_engine
 #include <chrono>       // std::chrono::system_clock
+#include <QMessageBox>
 using namespace std;
 
 Window::Window(QWidget *parent) : QWidget(parent)
@@ -103,6 +104,7 @@ Window::Window(QWidget *parent) : QWidget(parent)
     vblayout->addLayout(layoutGameMenu);
     hblayout->addLayout(vblayout);
     setLayout(hblayout);
+
 }
 
 void Window::UpdatePlayerButtons()
@@ -175,7 +177,12 @@ void Window::ShuffleColors(array<QString,8>& arrayHolder)
 
 void Window::ButtonClickedCheck()
 {
-    playerResultsLabel[0]->setText(CheckColors(buttonsFours, playerButtons[0]));
+    int i = 0;
+    while (playerResultsLabel[i]->text() != "lofasz")
+    {
+        ++i;
+    }
+    playerResultsLabel[i]->setText(CheckColors(buttonsFours, playerButtons[i]));
 }
 
 QString Window::CheckColors(lineFours const& rcolor, lineFours const& pcolor)
@@ -210,6 +217,13 @@ QString Window::CheckColors(lineFours const& rcolor, lineFours const& pcolor)
             (pcolor[2]->styleSheet() == pcolor[3]->styleSheet()))
     {
         rv = "color_duplicated";
+
+    }
+    if (rv == "bbbb")
+    {
+        QMessageBox msgBox;
+        msgBox.setText("You win!");
+        msgBox.exec();
     }
 
     return rv;
@@ -232,3 +246,6 @@ void Window::ButtonClickedSet()
         pb->setStyleSheet(selectedStyleSheet);
     }
 }
+
+
+
