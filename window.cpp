@@ -72,21 +72,28 @@ Window::Window(QWidget *parent) : QWidget(parent)
     }
     UpdateRaceColors();
 
-    QPushButton* newGame = new QPushButton("&Shuffle",this);
+//SHUFFLE
+    QPushButton* newQuiz = new QPushButton("&Shuffle",this);
+    newQuiz->setVisible(true);
+    newQuiz->setStyleSheet("color:purple; background-color:white");
+    connect(newQuiz, SIGNAL(clicked(bool)), this, SLOT(UpdateRaceColors()));
+    QFont font = newQuiz->font();
+    font.setPointSize(10);
+    newQuiz->setFont(font);
+//NEW
+    QPushButton* newGame = new QPushButton("&New",this);
     newGame->setVisible(true);
     newGame->setStyleSheet("color:purple; background-color:white");
-    connect(newGame, SIGNAL(clicked(bool)), this, SLOT(UpdateRaceColors()));
-    QFont font = newGame->font();
-    font.setPointSize(33);
+    connect(newGame, SIGNAL(clicked(bool)), this, SLOT(CreateNewGame()));
     newGame->setFont(font);
-
+//CHECK
     QPushButton* checkGame = new QPushButton("&Check",this);
     checkGame->setVisible(true);
     checkGame->setStyleSheet("color:red; background-color:white");
     connect(checkGame, SIGNAL(clicked(bool)), this, SLOT(ButtonClickedCheck()));
     checkGame->setFont(font);
 
-    QLabel* gameLabel(new QLabel("lofasz"));
+    gameLabel = new QLabel("Point");
     gameLabel->setVisible(true);
     gameLabel->setStyleSheet("QLabel {background-color : grey;}");
     gameLabel->setAutoFillBackground(true);
@@ -99,13 +106,15 @@ Window::Window(QWidget *parent) : QWidget(parent)
     vblayout->addLayout(layoutRaceColors);
     vblayout->addLayout(layoutPalette);
     vblayout->addWidget(gameLabel);
-    layoutGameMenu->addWidget(newGame,0,0);
-    layoutGameMenu->addWidget(checkGame,0,1);
+    layoutGameMenu->addWidget(newQuiz,0,0);
+    layoutGameMenu->addWidget(newGame,0,1);
+    layoutGameMenu->addWidget(checkGame,0,2);
     vblayout->addLayout(layoutGameMenu);
     hblayout->addLayout(vblayout);
     setLayout(hblayout);
 
 }
+
 
 void Window::UpdatePlayerButtons()
 {
@@ -169,6 +178,16 @@ void Window::UpdateRaceColors()
     }
 }
 
+void Window::CreateNewGame()
+{
+   Window::UpdateRaceColors();
+   Window::UpdatePlayerButtons();
+   for (int i = 0; i != 10; ++i)
+   {
+       playerResultsLabel[i]->setText("new");
+   }
+}
+
 void Window::ShuffleColors(array<QString,8>& arrayHolder)
 {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -178,7 +197,7 @@ void Window::ShuffleColors(array<QString,8>& arrayHolder)
 void Window::ButtonClickedCheck()
 {
     int i = 0;
-    while (playerResultsLabel[i]->text() != "lofasz")
+    while ((playerResultsLabel[i]->text() != "lofasz") && (playerResultsLabel[i]->text() != "new"))
     {
         ++i;
     }
@@ -224,9 +243,27 @@ QString Window::CheckColors(lineFours const& rcolor, lineFours const& pcolor)
         QMessageBox msgBox;
         msgBox.setText("You win!");
         msgBox.exec();
+        QString oldPoint;
+        oldPoint = gameLabel->text();
+        QString aktPoint;
+        aktPoint = QString::number(CalculatePoint());
+        gameLabel->setText(oldPoint + "\n" + aktPoint);
     }
 
     return rv;
+}
+
+int Window::CalculatePoint()
+{
+    int point = 1;
+    for (int i = 0; i != 10; ++i)
+    {
+        if ((playerResultsLabel[i]->text() != "new") && (playerResultsLabel[i]->text() != "lofasz"))
+        {
+           ++point;
+        }
+    }
+    return point;
 }
 
 void Window::ButtonClickedGet()

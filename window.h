@@ -18,6 +18,7 @@ class Window : public QWidget
     std::array<QLabel*,10> playerResultsLabel;
     QPushButton* paletteButtons[1][8];
     lineFours buttonsFours;
+    QLabel* gameLabel;
 
     QPushButton* newGame;
 
@@ -35,6 +36,8 @@ private slots:
     void ButtonClickedCheck();
     void ShuffleColors(std::array<QString,8>& arrayHolder);
     void UpdateRaceColors();
+    void CreateNewGame();
+    int CalculatePoint();
 };
 
 #endif // WINDOW_H
